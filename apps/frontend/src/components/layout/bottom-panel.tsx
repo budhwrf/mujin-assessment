@@ -23,7 +23,6 @@ export const BottomPanel = ({
   isSaving?: boolean
 }) => {
   const stats = useMapStats()
-  const map = useMapEditorStore((state) => state.map)
   const gridSize = useMapEditorStore((state) => state.gridSize)
   const expanded = mode === 'expanded'
 

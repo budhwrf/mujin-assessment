@@ -92,7 +92,11 @@ interface EditorState {
   undo: () => void
   redo: () => void
   loadSavedMap: (input: { id: string; name: string; document: MapDocument; updatedAt?: string }) => void
-  importDocument: (document: MapDocument, name?: string) => void
+  importDocument: (
+    document: MapDocument,
+    name?: string,
+    options?: { silent?: boolean; history?: boolean },
+  ) => void
   markSaving: () => void
   markSaved: (savedAt: string) => void
   markSaveError: () => void
@@ -113,6 +117,28 @@ const cloneMap = (map: EditorMap): EditorMap => ({
     chute: node.chute ? { ...node.chute } : undefined,
   })),
 })
+
+const withStableEditorIds = (document: MapDocument, previous: EditorMap): EditorMap => {
+  const previousByKey = new Map<string, string>(
+    previous.nodes.map((node) => [`${node.x}:${node.y}:${node.code}`, node.id]),
+  )
+  const used = new Set<string>()
+
+  return {
+    maxNeighborDistance: document.map.maxNeighborDistance,
+    nodes: document.map.nodes.map((node, index) => {
+      const key = `${node.x}:${node.y}:${node.code}`
+      const reused = previousByKey.get(key)
+      const fallback = previous.nodes[index]?.id
+      const id =
+        (reused && !used.has(reused) && reused) ||
+        (fallback && !used.has(fallback) && fallback) ||
+        createNodeId()
+      used.add(id)
+      return { ...node, id }
+    }),
+  }
+}
 
 const clampScale = (scale: number) => Math.min(4, Math.max(0.02, scale))
 
@@ -452,21 +478,23 @@ export const useMapEditorStore = create<EditorState>((set, get) => {
         pathStartId: null,
         statusMessage: null,
       }),
-    importDocument: (document, name) => {
+    importDocument: (document, name, options) => {
       const current = get()
+      const withHistory = options?.history !== false
+      const nextMap = withStableEditorIds(document, current.map)
+      const selectedStillExists = nextMap.nodes.some((node) => node.id === current.selectedNodeId)
       set({
-        history: [...current.history, { map: cloneMap(current.map), mapName: current.mapName }].slice(-80),
-        future: [],
+        history: withHistory
+          ? [...current.history, { map: cloneMap(current.map), mapName: current.mapName }].slice(-80)
+          : current.history,
+        future: withHistory ? [] : current.future,
         mapName: name?.trim() || current.mapName,
-        map: {
-          maxNeighborDistance: document.map.maxNeighborDistance,
-          nodes: withEditorIds(document.map.nodes),
-        },
+        map: nextMap,
         dirty: true,
-        selectedNodeId: null,
-        selectedPathId: null,
+        selectedNodeId: selectedStillExists ? current.selectedNodeId : null,
+        selectedPathId: withHistory ? null : current.selectedPathId,
         pathStartId: null,
-        statusMessage: 'Map imported',
+        statusMessage: options?.silent ? null : 'Map imported',
       })
     },
     markSaving: () => set({ saveStatus: 'saving' }),

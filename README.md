@@ -141,6 +141,14 @@ Open http://localhost:8080. Stop it with `Ctrl+C` if you started it in the foreg
 docker rm -f mujin-assessment
 ```
 
+### Build the image
+
+Builds `mujin-assessment:latest` from the current source. Use this before pushing, or when you only want the image without starting a container.
+
+```bash
+pnpm docker:build
+```
+
 ### Build and run locally
 
 This builds the Dockerfile and starts a local image named `mujin-assessment:latest`. `pnpm start` does the same thing.
@@ -157,12 +165,15 @@ docker rm -f mujin-assessment
 
 ### Publish
 
-Log in once, then push the local image to Docker Hub:
+Log in once, then build and push the latest image to Docker Hub:
 
 ```bash
 docker login
+pnpm docker:build
 pnpm docker:push
 ```
+
+`pnpm docker:push` also rebuilds automatically before tagging and pushing.
 
 That publishes `budhwrf/mujin-assessment:latest`. Pass another username with `pnpm docker:push -- YOUR_DOCKERHUB_USERNAME` if you need to.
 

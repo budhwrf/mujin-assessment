@@ -116,11 +116,12 @@ export const validateParsedMap = (map: AGVMap | EditorMap): ValidationResult => 
     const nodeId = readNodeId(node) ?? `node-${index}`
     const hasEdge = edges.some((edge) => edge.fromId === nodeId)
     if (!hasEdge && !connected.has(nodeId)) {
+      const label = node.name ? `"${node.name}"` : `(${node.x}, ${node.y})`
       warnings.push(
         issue(
           'warning',
           'orphan-direction',
-          'A travel direction has no neighbor within the maximum distance.',
+          `Node ${label} has a travel direction with no neighbor within the maximum distance.`,
           { nodeId, nodeIndex: index },
         ),
       )

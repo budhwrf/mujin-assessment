@@ -13,6 +13,7 @@
     "test": "pnpm --filter @mujin/map-domain test && pnpm --filter frontend test && pnpm --filter backend test",
     "test:coverage": "pnpm --filter @mujin/map-domain test:coverage && pnpm --filter frontend test:coverage && pnpm --filter backend test:coverage",
     "start": "bash scripts/start.sh",
+    "docker:build": "bash scripts/docker-build.sh",
     "docker:start": "bash scripts/start.sh",
     "docker:run": "bash scripts/docker-run.sh",
     "docker:push": "bash scripts/docker-push.sh"

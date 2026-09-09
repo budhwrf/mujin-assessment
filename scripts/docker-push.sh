@@ -101,20 +101,9 @@ require_login() {
   docker login"
 }
 
-ensure_local_image() {
-  if docker image inspect "${LOCAL_IMAGE}" >/dev/null 2>&1; then
-    return
-  fi
-
-  info "Local image ${LOCAL_IMAGE} was not found. Building it first..."
-  if ! docker build \
-    --file "${ROOT_DIR}/Dockerfile" \
-    --tag "${LOCAL_IMAGE}" \
-    "${ROOT_DIR}"; then
-    fail \
-      "The Docker image build failed." \
-      "Fix the error above, then run this command again."
-  fi
+build_local_image() {
+  info "Building ${LOCAL_IMAGE} with the latest code..."
+  bash "${ROOT_DIR}/scripts/docker-build.sh"
 }
 
 main() {
@@ -126,7 +115,7 @@ main() {
   require_docker
   username="$(resolve_username "${1:-}")"
   require_login
-  ensure_local_image
+  build_local_image
 
   remote_image="${username}/${IMAGE_REPO}:${IMAGE_TAG}"
 

@@ -8,7 +8,6 @@ IMAGE_NAME="mujin-assessment:latest"
 CONTAINER_NAME="mujin-assessment"
 HOST_PORT="8080"
 BASE_IMAGE="debian:bullseye"
-LOCAL_BASE_IMAGE="debian-bullseye:local"
 
 info() {
   printf '%s\n' "$1"
@@ -66,28 +65,7 @@ require_ports() {
 }
 
 ensure_image() {
-  info "Pulling ${BASE_IMAGE}..."
-  if ! docker pull "${BASE_IMAGE}"; then
-    fail \
-      "Could not pull ${BASE_IMAGE}." \
-      "Check your network connection, then run this command again."
-  fi
-
-  docker tag "${BASE_IMAGE}" "${LOCAL_BASE_IMAGE}"
-
-  info "Building ${IMAGE_NAME} from the Dockerfile..."
-  info "This can take a few minutes."
-  info ""
-
-  if ! docker build \
-    --file "${ROOT_DIR}/Dockerfile" \
-    --build-arg "BASE_IMAGE=${LOCAL_BASE_IMAGE}" \
-    --tag "${IMAGE_NAME}" \
-    "${ROOT_DIR}"; then
-    fail \
-      "The application or Docker image build failed." \
-      "Fix the error above, then run this command again."
-  fi
+  bash "${ROOT_DIR}/scripts/docker-build.sh"
 }
 
 scan_images() {
