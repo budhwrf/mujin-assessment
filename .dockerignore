@@ -1,0 +1,12 @@
+.git
+**/.git
+**/node_modules
+**/dist
+**/.turbo
+**/.DS_Store
+**/*.log
+**/*.tsbuildinfo
+.env
+.env.*
+!.env.example
+apps/frontend/README.md

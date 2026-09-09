@@ -1,0 +1,20 @@
+{
+  "name": "mujin-assessment",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @mujin/map-domain build && pnpm -r --parallel dev",
+    "build": "pnpm --filter @mujin/map-domain build && pnpm --filter frontend build && pnpm --filter backend build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm --filter @mujin/map-domain typecheck && pnpm --filter frontend typecheck && pnpm --filter backend typecheck",
+    "test": "pnpm --filter @mujin/map-domain test && pnpm --filter frontend test && pnpm --filter backend test",
+    "test:coverage": "pnpm --filter @mujin/map-domain test:coverage && pnpm --filter frontend test:coverage && pnpm --filter backend test:coverage",
+    "start": "bash scripts/start.sh",
+    "docker:start": "bash scripts/start.sh",
+    "docker:run": "bash scripts/docker-run.sh",
+    "docker:push": "bash scripts/docker-push.sh"
+  }
+}
